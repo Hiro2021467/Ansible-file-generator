@@ -1,4 +1,4 @@
-# VITEのプロジェクト用のDockerファイル
+# Reactを使ったAnsibleファイル作成補助ツール
 
 ## 使い方
 ```bash
