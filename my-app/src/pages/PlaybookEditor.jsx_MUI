@@ -1,0 +1,136 @@
+import React, { useState, useRef } from "react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { Button, Typography, TextField, IconButton, Grid } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+
+const ItemType = "ITEM";
+
+function PlaybookEditor() {
+  const [items, setItems] = useState(["Item 1", "Item 2", "Item 3"]);
+
+  const moveItem = (fromIndex, toIndex) => {
+    const updatedItems = [...items];
+    const [movedItem] = updatedItems.splice(fromIndex, 1);
+    updatedItems.splice(toIndex, 0, movedItem);
+    setItems(updatedItems);
+  };
+
+  const addItem = () => {
+    setItems([...items, `New Item ${items.length + 1}`]);
+  };
+
+  const removeItem = (index) => {
+    const updatedItems = [...items];
+    updatedItems.splice(index, 1);
+    setItems(updatedItems);
+  };
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div className="App">
+        <Typography variant="h4">Playbook Editor</Typography>
+      </div>
+      <div>
+        {items.map((item, index) => (
+          <DraggableItem
+            key={index}
+            index={index}
+            item={item}
+            moveItem={moveItem}
+            removeItem={() => removeItem(index)}
+          />
+        ))}
+      </div>
+      <div>
+        <Button variant="contained" color="primary" onClick={addItem}>
+          Add Item
+        </Button>
+      </div>
+    </DndProvider>
+  );
+}
+
+function DraggableItem({ item, index, moveItem, removeItem }) {
+  const [, ref] = useDrag({
+    type: ItemType,
+    item: { index },
+  });
+
+  const [, drop] = useDrop({
+    accept: ItemType,
+    hover: (draggedItem) => {
+      if (draggedItem.index !== index) {
+        moveItem(draggedItem.index, index);
+        draggedItem.index = index;
+      }
+    },
+  });
+
+  const [isEditing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+
+  const handleClick = () => {
+    setEditing(true);
+  };
+
+  const handleBlur = () => {
+    setEditing(false);
+  };
+
+  const handleInputChange = (e) => {
+    const updatedItems = [...items];
+    updatedItems[index] = e.target.value;
+    setItems(updatedItems);
+  };
+
+  const handleRemoveClick = () => {
+    removeItem(index);
+  };
+
+  return (
+    <div
+      ref={(node) => ref(drop(node))}
+      className={`Item ${isEditing ? "Editing" : ""}`}
+      style={{
+        border: "2px solid #333",
+        padding: "10px",
+        marginBottom: "5px",
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+      }}
+    >
+      <div className="DragHandle">
+        <DragIndicatorIcon />
+      </div>
+      <div>
+        {isEditing ? (
+          <TextField
+            value={item}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            inputRef={inputRef}
+            autoFocus
+          />
+        ) : (
+          <Grid container alignItems="center">
+            <Grid item xs={10}>
+              <Typography variant="body1" onClick={handleClick}>
+                {item}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <IconButton onClick={handleRemoveClick}>
+                <DeleteIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default PlaybookEditor;
