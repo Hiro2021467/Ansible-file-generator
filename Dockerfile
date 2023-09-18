@@ -6,4 +6,5 @@ WORKDIR /my-app
 
 EXPOSE 5173
 
-CMD npm install;npm run dev -- --host
+# CMD npm install && npm run dev -- --host
+CMD npm install && npm run dev -- --host
