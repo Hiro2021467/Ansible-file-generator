@@ -7,9 +7,12 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 const ItemType = "ITEM";
 
+// PlaybookEditor コンポーネント
 function PlaybookEditor() {
+  // アイテムのリストを管理する state
   const [items, setItems] = useState(["Item 1", "Item 2", "Item 3"]);
 
+  // アイテムの移動処理
   const moveItem = (fromIndex, toIndex) => {
     const updatedItems = [...items];
     const [movedItem] = updatedItems.splice(fromIndex, 1);
@@ -17,10 +20,12 @@ function PlaybookEditor() {
     setItems(updatedItems);
   };
 
+  // アイテムの追加処理
   const addItem = () => {
     setItems([...items, `New Item ${items.length + 1}`]);
   };
 
+  // アイテムの削除処理
   const removeItem = (index) => {
     const updatedItems = [...items];
     updatedItems.splice(index, 1);
@@ -33,6 +38,7 @@ function PlaybookEditor() {
         <Typography variant="h4">Playbook Editor</Typography>
       </div>
       <div>
+        {/* アイテムのリストをマップして表示 */}
         {items.map((item, index) => (
           <DraggableItem
             key={index}
@@ -44,6 +50,7 @@ function PlaybookEditor() {
         ))}
       </div>
       <div>
+        {/* アイテムを追加するボタン */}
         <Button variant="contained" color="primary" onClick={addItem}>
           Add Item
         </Button>
@@ -52,12 +59,15 @@ function PlaybookEditor() {
   );
 }
 
+// DraggableItem コンポーネント
 function DraggableItem({ item, index, moveItem, removeItem }) {
+  // ドラッグ可能なアイテムを設定
   const [, ref] = useDrag({
     type: ItemType,
     item: { index },
   });
 
+  // ドロップ可能な領域を設定
   const [, drop] = useDrop({
     accept: ItemType,
     hover: (draggedItem) => {
@@ -68,23 +78,28 @@ function DraggableItem({ item, index, moveItem, removeItem }) {
     },
   });
 
+  // アイテムの編集状態を管理する state
   const [isEditing, setEditing] = useState(false);
   const inputRef = useRef(null);
 
+  // アイテムをクリックしたときの処理
   const handleClick = () => {
     setEditing(true);
   };
 
+  // アイテムの編集を終了したときの処理
   const handleBlur = () => {
     setEditing(false);
   };
 
+  // アイテムのテキストが変更されたときの処理
   const handleInputChange = (e) => {
     const updatedItems = [...items];
     updatedItems[index] = e.target.value;
     setItems(updatedItems);
   };
 
+  // アイテムを削除するボタンをクリックしたときの処理
   const handleRemoveClick = () => {
     removeItem(index);
   };
